@@ -30,7 +30,7 @@ impl ResponseError for WebError {
     fn status_code(&self) -> StatusCode {
         match self {
             Self::Unauthorized => StatusCode::UNAUTHORIZED,
-            Self::InvalidCredentials => StatusCode::PRECONDITION_FAILED,
+            Self::InvalidCredentials => StatusCode::UNAUTHORIZED,
             Self::Tacti(_) => StatusCode::FAILED_DEPENDENCY,
             Self::Dal(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }

@@ -1,0 +1,6 @@
+syntax = "proto3";
+package dev.array21.tactibetter;
+
+message GetSessionResponse {
+  int64 expiry = 1;
+}

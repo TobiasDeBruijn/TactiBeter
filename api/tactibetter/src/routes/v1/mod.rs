@@ -4,6 +4,7 @@ use crate::routes::Routable;
 
 mod login;
 mod schedule;
+mod session;
 
 pub struct Router;
 
@@ -12,6 +13,7 @@ impl Routable for Router {
         config.service(web::scope("/v1")
             .route("/login", web::post().to(login::login))
             .route("/schedule", web::get().to(schedule::get))
+            .route("/session", web::post().to(session::session))
         );
     }
 }

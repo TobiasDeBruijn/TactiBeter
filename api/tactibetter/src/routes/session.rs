@@ -7,13 +7,16 @@ use crate::dal::user::User;
 use crate::routes::error::WebError;
 use crate::WebData;
 
-pub struct Session(pub User);
+pub struct Session {
+    pub user: User,
+    pub id: String,
+}
 
 impl Deref for Session {
     type Target = User;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.user
     }
 }
 
@@ -34,7 +37,10 @@ impl FromRequest for Session {
             let user = User::get_by_session(&data.pool, &data.config.encryption_key, authorization)?
                 .ok_or(WebError::Unauthorized)?;
 
-            Ok(Self(user))
+            Ok(Self {
+                user,
+                id: authorization.to_string(),
+            })
         })
     }
 }

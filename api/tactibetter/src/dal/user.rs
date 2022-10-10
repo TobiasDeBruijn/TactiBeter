@@ -85,7 +85,7 @@ impl User {
         Ok((id, exp))
     }
 
-    pub fn reset_session_expiry<S: AsRef<str>>(&self, pool: &Pool, session_id: S) -> DalResult<()> {
+    pub fn reset_session_expiry<S: AsRef<str>>(&self, pool: &Pool, session_id: S) -> DalResult<i64> {
         let mut conn = pool.get_conn()?;
         let exp: i64 = time::OffsetDateTime::now_utc().unix_timestamp() + SESSION_VALID_SECS;
 
@@ -94,7 +94,7 @@ impl User {
             "expiry" => exp
         })?;
 
-        Ok(())
+        Ok(exp)
     }
 
     pub fn update_password<S: AsRef<str>>(&mut self, pool: &Pool, encryption_key: &str, new_password: S) -> DalResult<()> {
