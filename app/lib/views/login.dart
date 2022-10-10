@@ -48,6 +48,7 @@ class _LoginFormState extends State<_LoginForm> {
             controller: widget._usernameController,
             validator: _validateRequiredField,
             autovalidateMode: AutovalidateMode.always,
+            autofillHints: const [AutofillHints.username],
             decoration: const InputDecoration(
               labelText: 'Gebruikersnaam'
             ),
@@ -56,6 +57,7 @@ class _LoginFormState extends State<_LoginForm> {
             controller: widget._passwordController,
             validator: _validateRequiredField,
             autovalidateMode: AutovalidateMode.always,
+            autofillHints: const [AutofillHints.password],
             obscureText: true,
             decoration: const InputDecoration(
               labelText: 'Wachtwoord'
@@ -94,7 +96,7 @@ class _LoginFormState extends State<_LoginForm> {
       case -1:
         debugPrint("Request failed");
         Future<void>.delayed(Duration.zero, () {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Er is iets verkeerd gegaan. Probeer het later opnieuw.")));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Er is iets verkeerd gegaan. Probeer het later opnieuw. (E1)")));
         });
         break;
 

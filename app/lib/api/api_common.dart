@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const String server = kReleaseMode ? "http://10.10.5.1:8080" : "https://api.array21.dev/tactibetter/api";
+const String server = "https://api.array21.dev/tactibetter/api";
 
 Map<String, String> getProtobufHeaders() {
   return {
@@ -40,7 +40,7 @@ class Response<T> {
   Response.fail(http.Response response) {
     status = response.statusCode;
     if(response.body == "") {
-      message = "Er is iets verkeerd gegaan, probeer het later opnieuw";
+      message = "Er is iets verkeerd gegaan, probeer het later opnieuw (E0)";
     } else {
       message = response.body;
     }
