@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tactibetter/api/login.dart';
+import 'package:tactibetter/pages/about.dart';
 import 'package:tactibetter/pages/schedule.dart';
 import 'package:tactibetter/util/prefs.dart';
 import 'package:tactibetter/views/login.dart';
@@ -24,6 +25,7 @@ class _HomeViewState extends State<HomeView> {
       body: _getNavigationPages()[_navIdx],
       bottomNavigationBar: BottomNavigationBar(
         items: _getNavigationItems(),
+        currentIndex: _navIdx,
         onTap: (idx) {
           setState(() {
             _navIdx = idx;
@@ -53,7 +55,7 @@ class _HomeViewState extends State<HomeView> {
   List<Widget> _getNavigationPages() {
     return [
       SchedulePage(session: widget.session),
-      SchedulePage(session: widget.session),
+      const AboutPage(),
     ];
   }
 
@@ -61,11 +63,11 @@ class _HomeViewState extends State<HomeView> {
     return [
       const BottomNavigationBarItem(
         icon: Icon(Icons.schedule),
-        label: 'Rooster'
+        label: 'Mijn Rooster'
       ),
       const BottomNavigationBarItem(
-          icon: Icon(Icons.schedule),
-          label: 'Rooster'
+          icon: Icon(Icons.info_outline),
+          label: 'Over'
       ),
     ];
   }

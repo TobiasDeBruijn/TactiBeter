@@ -1,10 +1,12 @@
+use std::str::FromStr;
 use chrono::{Datelike, NaiveDate, NaiveDateTime, NaiveTime};
 use chrono_tz::UTC;
 use serde::{Serialize, Deserialize};
 use crate::tactiplan::{CLIENT, get_php_sessid, TACTI_BASE, TactiError, TactiResult};
 use const_format::concatcp;
+use tap::TapFallible;
 use time::{Date, Duration, Month, OffsetDateTime, PrimitiveDateTime, Time, UtcOffset};
-use tracing::trace;
+use tracing::{trace, warn};
 use tz::LocalTimeType;
 use tracing::instrument;
 
@@ -31,8 +33,15 @@ struct Response {
 
 #[derive(Debug, Deserialize)]
 struct Data {
-    published: String,
+    published: Published,
     blocks: Vec<Block>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+enum Published {
+    BeenPublished(bool),
+    PublishedAt(String),
 }
 
 #[derive(Debug, Deserialize)]
@@ -71,7 +80,7 @@ pub async fn get_schedule(phpsessid: &str, jwt: &str, week: i64) -> TactiResult<
         transaction: "",
     })?;
 
-    let response: Response = CLIENT.post(SCHEDULE_URL)
+    let response_text = CLIENT.post(SCHEDULE_URL)
         .header("Cookie", format!("PHPSESSID={phpsessid}"))
         .form(&FormRequest {
             data: &data,
@@ -80,10 +89,11 @@ pub async fn get_schedule(phpsessid: &str, jwt: &str, week: i64) -> TactiResult<
         .send()
         .await?
         .error_for_status()?
-        .json()
+        .text()
         .await?;
 
-    trace!("{response:#?}");
+    let response: Response = serde_json::from_str(&response_text)
+        .tap_err(|e| warn!("Failed to deserialize json payload: {e}. Original body\n: {response_text}"))?;
 
     response.data.blocks.into_iter()
         .map(block_to_schedule)

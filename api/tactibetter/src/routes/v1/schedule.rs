@@ -14,9 +14,7 @@ pub struct Query {
 
 pub async fn get(session: Session, query: web::Query<Query>) -> WebResult<Payload<GetScheduleResponse>> {
     let phpsessid = crate::tactiplan::login::login(&session.name, &session.password).await?;
-    trace!("using sessid {phpsessid}");
     let jwt_token = crate::tactiplan::app_index::get_jwt(&phpsessid).await?;
-    trace!("Using jwt {jwt_token}");
 
     let week = if let Some(week_number) = query.week_number {
         let europe_ams = chrono_tz::Europe::Amsterdam;
@@ -43,8 +41,6 @@ pub async fn get(session: Session, query: web::Query<Query>) -> WebResult<Payloa
         let datetime = date.and_time(NaiveTime::from_hms(0, 0, 0)).unwrap();
         datetime.timestamp()
     };
-
-    trace!("{week}");
 
     let schedule = crate::tactiplan::schedule::get_schedule(&phpsessid, &jwt_token, week).await?;
     let schedule = schedule.into_iter()

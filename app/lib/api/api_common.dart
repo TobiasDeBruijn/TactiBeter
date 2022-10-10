@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const String server = "http://10.10.5.1:8080";
+const String server = kReleaseMode ? "http://10.10.5.1:8080" : "https://api.array21.dev/tactibetter/api";
 
 Map<String, String> getProtobufHeaders() {
   return {

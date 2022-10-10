@@ -11,7 +11,7 @@ pub struct Router;
 
 impl Routable for Router {
     fn configure(config: &mut ServiceConfig) {
-        config.service(web::scope("")
+        config.service(web::scope("/api")
             .configure(v1::Router::configure)
         );
     }
