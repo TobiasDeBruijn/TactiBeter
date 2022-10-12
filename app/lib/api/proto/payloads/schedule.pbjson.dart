@@ -12,9 +12,9 @@ import 'dart:typed_data' as $typed_data;
 const GetScheduleResponse$json = const {
   '1': 'GetScheduleResponse',
   '2': const [
-    const {'1': 'schedules', '3': 1, '4': 3, '5': 11, '6': '.dev.array21.tactibetter.Schedule', '10': 'schedules'},
+    const {'1': 'scheduleDays', '3': 1, '4': 3, '5': 11, '6': '.dev.array21.tactibetter.ScheduleDay', '10': 'scheduleDays'},
   ],
 };
 
 /// Descriptor for `GetScheduleResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getScheduleResponseDescriptor = $convert.base64Decode('ChNHZXRTY2hlZHVsZVJlc3BvbnNlEj8KCXNjaGVkdWxlcxgBIAMoCzIhLmRldi5hcnJheTIxLnRhY3RpYmV0dGVyLlNjaGVkdWxlUglzY2hlZHVsZXM=');
+final $typed_data.Uint8List getScheduleResponseDescriptor = $convert.base64Decode('ChNHZXRTY2hlZHVsZVJlc3BvbnNlEkgKDHNjaGVkdWxlRGF5cxgBIAMoCzIkLmRldi5hcnJheTIxLnRhY3RpYmV0dGVyLlNjaGVkdWxlRGF5UgxzY2hlZHVsZURheXM=');

@@ -13,17 +13,17 @@ import '../entities/schedule.pb.dart' as $0;
 
 class GetScheduleResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetScheduleResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'dev.array21.tactibetter'), createEmptyInstance: create)
-    ..pc<$0.Schedule>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'schedules', $pb.PbFieldType.PM, subBuilder: $0.Schedule.create)
+    ..pc<$0.ScheduleDay>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'scheduleDays', $pb.PbFieldType.PM, protoName: 'scheduleDays', subBuilder: $0.ScheduleDay.create)
     ..hasRequiredFields = false
   ;
 
   GetScheduleResponse._() : super();
   factory GetScheduleResponse({
-    $core.Iterable<$0.Schedule>? schedules,
+    $core.Iterable<$0.ScheduleDay>? scheduleDays,
   }) {
     final _result = create();
-    if (schedules != null) {
-      _result.schedules.addAll(schedules);
+    if (scheduleDays != null) {
+      _result.scheduleDays.addAll(scheduleDays);
     }
     return _result;
   }
@@ -49,6 +49,6 @@ class GetScheduleResponse extends $pb.GeneratedMessage {
   static GetScheduleResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$0.Schedule> get schedules => $_getList(0);
+  $core.List<$0.ScheduleDay> get scheduleDays => $_getList(0);
 }
 

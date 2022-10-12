@@ -2,21 +2,28 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:tactibetter/api/api_common.dart';
 import 'package:tactibetter/api/proto/payloads/schedule.pb.dart';
-import 'package:tactibetter/api/proto/entities/schedule.pb.dart' as proto_schedule;
+
+class ScheduleDay {
+  final DateTime date;
+  final DateTime begin;
+  final DateTime end;
+  final List<ScheduleEntry> scheduleEntries;
+
+  const ScheduleDay({required this.date, required this.begin, required this.end, required this.scheduleEntries});
+}
 
 class ScheduleEntry {
-  final DateTime date;
   final DateTime begin;
   final DateTime end;
   final DateTime created;
   final String task;
   final String department;
 
-  const ScheduleEntry({required this.date, required this.begin, required this.end, required this.created, required this.task, required this.department});
+  const ScheduleEntry({required this.begin, required this.end, required this.created, required this.task, required this.department});
 }
 
 class Schedule {
-  static Future<Response<List<ScheduleEntry>>> getSchedule(String sessionId, {int? weekNumber}) async {
+  static Future<Response<List<ScheduleDay>>> getSchedule(String sessionId, {int? weekNumber}) async {
     String maybeQuery = "";
     if(weekNumber != null) {
       maybeQuery = "?week_number=$weekNumber";
@@ -32,27 +39,27 @@ class Schedule {
       }
 
       GetScheduleResponse getScheduleResponse = GetScheduleResponse.fromBuffer(response.bodyBytes);
-      List<ScheduleEntry> entries = getScheduleResponse.schedules.map(_scheduleToScheduleEntry).toList();
+      List<ScheduleDay> scheduleDays = getScheduleResponse.scheduleDays.map((day) => ScheduleDay(
+          date: _epochToDateTimeLocal(day.date.toInt()),
+          begin: _epochToDateTimeLocal(day.begin.toInt()),
+          end: _epochToDateTimeLocal(day.end.toInt()),
+          scheduleEntries: day.scheduleEntries.map((entry) => ScheduleEntry(
+              begin: _epochToDateTimeLocal(entry.begin.toInt()),
+              end: _epochToDateTimeLocal(entry.end.toInt()),
+              created: _epochToDateTimeLocal(entry.created.toInt()),
+              task: entry.task,
+              department: entry.department)
+          ).toList()
+      )).toList();
 
-      return Response.ok(entries);
+      return Response.ok(scheduleDays);
     } on SocketException catch(e) {
       return Response.connFail(e);
     }
   }
 
-  static ScheduleEntry _scheduleToScheduleEntry(proto_schedule.Schedule schedule) {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(schedule.date.toInt() * 1000, isUtc: true);
-    DateTime begin = DateTime.fromMillisecondsSinceEpoch(schedule.begin.toInt() * 1000, isUtc: true);
-    DateTime end = DateTime.fromMillisecondsSinceEpoch(schedule.end.toInt() * 1000, isUtc: true);
-    DateTime created = DateTime.fromMillisecondsSinceEpoch(schedule.created.toInt() * 1000, isUtc: true);
-
-    return ScheduleEntry(
-      date: date.toLocal(),
-      begin: begin.toLocal(),
-      end: end.toLocal(),
-      created: created.toLocal(),
-      department: schedule.department,
-      task: schedule.task
-    );
+  static DateTime _epochToDateTimeLocal(int epoch) {
+    DateTime dt = DateTime.fromMillisecondsSinceEpoch(epoch * 1000, isUtc: true);
+    return dt.toLocal();
   }
 }

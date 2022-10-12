@@ -1,11 +1,12 @@
+use std::collections::HashMap;
 use actix_multiresponse::Payload;
 use actix_web::web;
 use chrono::{Datelike, NaiveDateTime, NaiveTime, TimeZone, Weekday};
 use serde::Deserialize;
-use tracing::trace;
 use proto::GetScheduleResponse;
 use crate::routes::error::WebResult;
 use crate::routes::session::Session;
+use crate::tactiplan::schedule::Schedule;
 
 #[derive(Debug, Deserialize)]
 pub struct Query {
@@ -43,18 +44,42 @@ pub async fn get(session: Session, query: web::Query<Query>) -> WebResult<Payloa
     };
 
     let schedule = crate::tactiplan::schedule::get_schedule(&phpsessid, &jwt_token, week).await?;
-    let schedule = schedule.into_iter()
-        .map(|x| proto::Schedule {
-            date: x.date,
-            created: x.created,
-            begin: x.begin,
-            end: x.end,
-            task: x.task,
-            department: x.department,
+    let mut day_schedules: HashMap<i64, (i64, i64, Vec<Schedule>)> = HashMap::with_capacity(schedule.len());
+
+    for schedule in schedule.into_iter() {
+        day_schedules.entry(schedule.date)
+            .and_modify(|(begin, end, schedules)| {
+                if schedule.begin < *begin {
+                    *begin = schedule.begin
+                }
+
+                if schedule.end > *end {
+                    *end = schedule.end
+                }
+
+                schedules.push(schedule.clone())
+            })
+            .or_insert((schedule.begin, schedule.end, vec![schedule]));
+    }
+
+    let schedule_days = day_schedules.into_iter()
+        .map(|(date, (begin, end, schedules))| proto::ScheduleDay {
+            date,
+            begin,
+            end,
+            schedule_entries: schedules.into_iter()
+                .map(|schedule| proto::ScheduleEntry {
+                    begin: schedule.begin,
+                    end: schedule.end,
+                    created: schedule.created,
+                    department: schedule.department,
+                    task: schedule.task,
+                })
+                .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
 
     Ok(Payload(GetScheduleResponse {
-        schedules: schedule
+        schedule_days
     }))
 }

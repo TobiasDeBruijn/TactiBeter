@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const String server = "https://api.array21.dev/tactibetter/api";
+//const String server = "https://api.array21.dev/tactibetter/api";
+const String server = "http://145.107.89.232:8080/api";
 
 Map<String, String> getProtobufHeaders() {
   return {

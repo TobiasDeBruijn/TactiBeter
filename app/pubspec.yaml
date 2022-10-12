@@ -29,6 +29,7 @@ dependencies:
   new_version: ^0.3.0
   cupertino_icons: ^1.0.2
   intl: ^0.17.0
+  expandable: ^5.0.1
 
 dev_dependencies:
   flutter_test:

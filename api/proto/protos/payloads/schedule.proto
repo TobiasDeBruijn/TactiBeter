@@ -4,5 +4,5 @@ package dev.array21.tactibetter;
 import "entities/schedule.proto";
 
 message GetScheduleResponse {
-  repeated Schedule schedules = 1;
+  repeated ScheduleDay scheduleDays = 1;
 }

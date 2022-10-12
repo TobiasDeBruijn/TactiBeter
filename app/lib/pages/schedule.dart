@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tactibetter/api/api_common.dart';
 import 'package:tactibetter/api/login.dart';
 import 'package:tactibetter/api/schedule.dart';
-import 'package:tactibetter/components/schedule.dart';
+import 'package:tactibetter/components/schedule/schedule_day.dart';
 import 'package:tactibetter/components/weekselector.dart';
 
 class SchedulePage extends StatefulWidget {
@@ -15,15 +17,16 @@ class SchedulePage extends StatefulWidget {
 }
 
 class _ScheduleState extends State<SchedulePage> {
-  List<ScheduleEntry> _scheduleEntries = [];
+  List<ScheduleDay> _scheduleDays = [];
   bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
       children: [
         WeekSelector(onChange: (newWeek) => _loadSchedule(weekNumber: newWeek)),
         _isLoading ? _getIsLoading() : _getIsLoaded(),
+        _getDebugButtons(),
       ],
     );
   }
@@ -36,7 +39,7 @@ class _ScheduleState extends State<SchedulePage> {
   }
 
   Widget _getIsLoaded() {
-    List<Widget> scheduleComponents = _scheduleEntries.map(_getScheduleComponent).toList();
+    List<Widget> scheduleComponents = _scheduleDays.map(_getScheduleDay).toList();
     return Column(
       children: [
         scheduleComponents.isNotEmpty ? _getScheduleListView(scheduleComponents) : _getNoScheduleAvailableText()
@@ -59,11 +62,11 @@ class _ScheduleState extends State<SchedulePage> {
     );
   }
 
-  Widget _getScheduleComponent(ScheduleEntry entry) {
+  Widget _getScheduleDay(ScheduleDay day) {
     return Card(
       child: InkWell(
         onTap: () => {},
-        child: ScheduleComponent(scheduleEntry: entry),
+        child: ScheduleDayComponent(scheduleDay: day),
       ),
     );
   }
@@ -73,12 +76,62 @@ class _ScheduleState extends State<SchedulePage> {
     _loadSchedule();
   }
 
+  Widget _getDebugButtons() {
+    if(kReleaseMode) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ElevatedButton(
+          child: const Text("Set fake schedule"),
+          onPressed: () {
+            DateTime localNow = DateTime.now().toLocal();
+            setState(() {
+              _scheduleDays = [
+                ScheduleDay(
+                    date: localNow,
+                    begin: localNow,
+                    end: localNow.add(const Duration(hours: 5)),
+                    scheduleEntries: [
+                      ScheduleEntry(
+                          begin: localNow,
+                          end: localNow.add(const Duration(hours: 1)),
+                          created: localNow.subtract(const Duration(days: 5)),
+                          department: "Example dep",
+                          task: "Task A",
+                      ),
+                      ScheduleEntry(
+                          begin: localNow.add(const Duration(hours: 1)),
+                          end: localNow.add(const Duration(hours: 3)),
+                          created: localNow.subtract(const Duration(days: 5)),
+                          department: "Example dep",
+                          task: "Task B"
+                      ),
+                      ScheduleEntry(
+                          begin: localNow.add(const Duration(hours: 3)),
+                          end: localNow.add(const Duration(hours: 7)),
+                          created: localNow.subtract(const Duration(days: 5)),
+                          department: "Example dep",
+                          task: "Task C"
+                      ),
+                    ]
+                )
+              ];
+            });
+          },
+        )
+      ],
+    );
+  }
+
   void _loadSchedule({int? weekNumber}) async {
     setState(() {
       _isLoading = true;
     });
 
-    Response<List<ScheduleEntry>> response = await Schedule.getSchedule(widget.session.id, weekNumber: weekNumber);
+    Response<List<ScheduleDay>> response = await Schedule.getSchedule(widget.session.id, weekNumber: weekNumber);
     if(!mounted) return;
 
     setState(() {
@@ -94,7 +147,7 @@ class _ScheduleState extends State<SchedulePage> {
         break;
       case 200:
         setState(() {
-          _scheduleEntries = response.value!;
+          _scheduleDays = response.value!;
         });
         break;
       default:

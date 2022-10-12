@@ -1,8 +1,14 @@
 syntax = "proto3";
 package dev.array21.tactibetter;
 
-message Schedule {
+message ScheduleDay {
   int64 date = 1;
+  int64 begin = 2;
+  int64 end = 3;
+  repeated ScheduleEntry scheduleEntries = 4;
+}
+
+message ScheduleEntry {
   int64 begin = 2;
   int64 end = 3;
   int64 created = 4;

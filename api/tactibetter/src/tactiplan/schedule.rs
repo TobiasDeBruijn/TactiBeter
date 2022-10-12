@@ -1,12 +1,11 @@
-use std::str::FromStr;
 use chrono::{Datelike, NaiveDate, NaiveDateTime, NaiveTime};
 use chrono_tz::UTC;
 use serde::{Serialize, Deserialize};
-use crate::tactiplan::{CLIENT, get_php_sessid, TACTI_BASE, TactiError, TactiResult};
+use crate::tactiplan::{CLIENT, TACTI_BASE, TactiError, TactiResult};
 use const_format::concatcp;
 use tap::TapFallible;
-use time::{Date, Duration, Month, OffsetDateTime, PrimitiveDateTime, Time, UtcOffset};
-use tracing::{trace, warn};
+use time::{Date, Month, OffsetDateTime, PrimitiveDateTime, Time, UtcOffset};
+use tracing::warn;
 use tz::LocalTimeType;
 use tracing::instrument;
 
@@ -52,8 +51,10 @@ struct Block {
     task: String,
     department: String,
     created: String,
+    removed: String,
 }
 
+#[derive(Clone)]
 pub struct Schedule {
     /// Unix epoch seconds of the day the event takes place
     pub date: i64,
@@ -69,7 +70,7 @@ pub struct Schedule {
 
 #[instrument(skip(jwt))]
 pub async fn get_schedule(phpsessid: &str, jwt: &str, week: i64) -> TactiResult<Vec<Schedule>> {
-    let ndt = chrono::NaiveDateTime::from_timestamp(week, 0);
+    let ndt = NaiveDateTime::from_timestamp(week, 0);
     let dt_utc = ndt.and_local_timezone(UTC).unwrap();
     let dt_eur_ams = dt_utc.with_timezone(&chrono_tz::Europe::Amsterdam);
 
@@ -96,6 +97,28 @@ pub async fn get_schedule(phpsessid: &str, jwt: &str, week: i64) -> TactiResult<
         .tap_err(|e| warn!("Failed to deserialize json payload: {e}. Original body\n: {response_text}"))?;
 
     response.data.blocks.into_iter()
+        .map(|x| {
+            // If no removed date is set, the date is set to 9999-00-00
+            // This is an unparsable date so we bail early with a fake date in the future
+            if x.removed.starts_with("9999") {
+                Ok((x, OffsetDateTime::now_utc().unix_timestamp() + 10_0000))
+            } else {
+                let removed=  time_string_to_epoch(&x.removed)?;
+                Ok((x, removed))
+            }
+
+        })
+        .collect::<TactiResult<Vec<_>>>()?
+        .into_iter()
+        .filter(|(_, removed)| {
+            if OffsetDateTime::now_utc().unix_timestamp() > *removed {
+                false
+            } else {
+                true
+            }
+        })
+        .into_iter()
+        .map(|(block, _)| block)
         .map(block_to_schedule)
         .collect::<TactiResult<Vec<_>>>()
 }
@@ -180,21 +203,4 @@ fn numeric_to_month(num: i32) -> TactiResult<Month> {
     };
 
     Ok(m)
-}
-
-fn month_to_numeric(month: &Month) -> i32 {
-    match month {
-        Month::January => 1,
-        Month::February => 2,
-        Month::March => 3,
-        Month::April => 4,
-        Month::May => 5,
-        Month::June => 6,
-        Month::July => 7,
-        Month::August => 8,
-        Month::September => 9,
-        Month::October => 10,
-        Month::November => 11,
-        Month::December => 12,
-    }
 }
