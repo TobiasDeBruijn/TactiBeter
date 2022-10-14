@@ -40,13 +40,13 @@ class Schedule {
 
       GetScheduleResponse getScheduleResponse = GetScheduleResponse.fromBuffer(response.bodyBytes);
       List<ScheduleDay> scheduleDays = getScheduleResponse.scheduleDays.map((day) => ScheduleDay(
-          date: _epochToDateTimeLocal(day.date.toInt()),
-          begin: _epochToDateTimeLocal(day.begin.toInt()),
-          end: _epochToDateTimeLocal(day.end.toInt()),
+          date: epochToDateTimeLocal(day.date.toInt()),
+          begin: epochToDateTimeLocal(day.begin.toInt()),
+          end: epochToDateTimeLocal(day.end.toInt()),
           scheduleEntries: day.scheduleEntries.map((entry) => ScheduleEntry(
-              begin: _epochToDateTimeLocal(entry.begin.toInt()),
-              end: _epochToDateTimeLocal(entry.end.toInt()),
-              created: _epochToDateTimeLocal(entry.created.toInt()),
+              begin: epochToDateTimeLocal(entry.begin.toInt()),
+              end: epochToDateTimeLocal(entry.end.toInt()),
+              created: epochToDateTimeLocal(entry.created.toInt()),
               task: entry.task,
               department: entry.department)
           ).toList()
@@ -56,10 +56,5 @@ class Schedule {
     } on SocketException catch(e) {
       return Response.connFail(e);
     }
-  }
-
-  static DateTime _epochToDateTimeLocal(int epoch) {
-    DateTime dt = DateTime.fromMillisecondsSinceEpoch(epoch * 1000, isUtc: true);
-    return dt.toLocal();
   }
 }

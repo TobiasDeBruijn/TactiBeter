@@ -18,7 +18,7 @@ class ScheduleEntryComponent extends StatelessWidget {
         children: [
           Text(
             "${timeOnlyFormat.format(scheduleEntry.begin)} - ${timeOnlyFormat.format(scheduleEntry.end)}",
-            style: GoogleFonts.oxygen(),
+            style: GoogleFonts.oxygen(fontSize: 20),
           ),
           Text(
             "${scheduleEntry.department} - ${scheduleEntry.task}",

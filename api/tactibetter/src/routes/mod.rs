@@ -2,6 +2,7 @@ mod v1;
 mod error;
 mod routable;
 mod session;
+mod empty;
 
 use actix_web::web;
 use actix_web::web::ServiceConfig;

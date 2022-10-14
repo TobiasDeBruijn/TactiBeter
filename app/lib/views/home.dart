@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tactibetter/api/login.dart';
 import 'package:tactibetter/pages/about.dart';
 import 'package:tactibetter/pages/schedule.dart';
+import 'package:tactibetter/pages/timesheet/timesheet.dart';
 import 'package:tactibetter/util/prefs.dart';
 import 'package:tactibetter/views/login.dart';
 
@@ -55,6 +56,7 @@ class _HomeViewState extends State<HomeView> {
   List<Widget> _getNavigationPages() {
     return [
       SchedulePage(session: widget.session),
+      TimesheetPage(session: widget.session),
       const AboutPage(),
     ];
   }
@@ -64,6 +66,10 @@ class _HomeViewState extends State<HomeView> {
       const BottomNavigationBarItem(
         icon: Icon(Icons.schedule),
         label: 'Mijn Rooster'
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.hourglass_empty_sharp),
+        label: "Urenregistratie",
       ),
       const BottomNavigationBarItem(
           icon: Icon(Icons.info_outline),

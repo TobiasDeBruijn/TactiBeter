@@ -20,6 +20,11 @@ Map<String, String> getHeaders(String sessionId) {
   return headers;
 }
 
+DateTime epochToDateTimeLocal(int epoch) {
+  DateTime dt = DateTime.fromMillisecondsSinceEpoch(epoch * 1000, isUtc: true);
+  return dt.toLocal();
+}
+
 class Response<T> {
   late final int status;
   late final String? message;
