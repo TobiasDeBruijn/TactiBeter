@@ -5,7 +5,7 @@ import 'package:tactibetter/api/login.dart';
 import 'package:tactibetter/api/timesheet.dart';
 import 'package:tactibetter/components/day_selector.dart';
 import 'package:tactibetter/components/timesheet/block_in_list.dart';
-import 'package:tactibetter/util/datetime.dart';
+import 'package:tactibetter/pages/timesheet/view_block.dart';
 
 class TimesheetPage extends StatefulWidget {
   final Session session;
@@ -26,7 +26,21 @@ class _TimesheetState extends State<TimesheetPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         tooltip: "Urenregistratie toevoegen",
-        onPressed: () => {},
+        onPressed: () async {
+          TimesheetBlock? result = await Navigator.of(context).push(MaterialPageRoute(builder: (builder) => TimesheetBlockViewPage(
+              title: "Aanmaken",
+              departments: _timesheet!.departments,
+              taskGroups: _timesheet!.taskGroups,
+              createForDateTime: DateTime.now().toLocal(),
+          )));
+
+          if(result == null) return;
+
+          // TODO save to API
+          setState(() {
+            _timesheet!.blocks.add(result);
+          });
+        },
         child: const Icon(Icons.add)
       ),
       body: ListView(
@@ -60,15 +74,11 @@ class _TimesheetState extends State<TimesheetPage> {
     }
 
     return Column(
-      children: _timesheet!.blocks.map((e) => _getTimesheetBlockTappable(e)).toList(),
-    );
-  }
-
-  Widget _getTimesheetBlockTappable(TimesheetBlock block) {
-    return Card(
-      child: InkWell(
-        onTap: () => {}, // TODO
-        child: TimesheetBlockInListComponent(timesheetBlock: block),
+      children: List.generate(_timesheet!.blocks.length, (idx) => _EditableTimesheetBlock(
+          value: _timesheet!.blocks[idx],
+          departments: _timesheet!.departments,
+          taskGroups: _timesheet!.taskGroups,
+          onChange: (newValue) => setState(() => _timesheet!.blocks[idx] = newValue))
       ),
     );
   }
@@ -114,5 +124,35 @@ class _TimesheetState extends State<TimesheetPage> {
     }
 
     // TODO
+  }
+}
+
+class _EditableTimesheetBlock extends StatelessWidget {
+  final TimesheetBlock value;
+  final List<NamedId> departments, taskGroups;
+  final Function(TimesheetBlock value) onChange;
+
+  const _EditableTimesheetBlock({super.key, required this.value, required this.departments, required this.taskGroups, required this.onChange});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: () async {
+          TimesheetBlock? result = await Navigator.of(context).push(MaterialPageRoute(builder: (builder) => TimesheetBlockViewPage(
+            timesheetBlock: value,
+            title: "Bewerken",
+            departments: departments,
+            taskGroups: taskGroups,
+          )));
+          if(result == null) return;
+
+          // TODO save the block
+
+          onChange(result);
+        },
+        child: TimesheetBlockInListComponent(timesheetBlock: value),
+      ),
+    );
   }
 }

@@ -1,8 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:tactibetter/api/proto/entities/timesheet.pbserver.dart';
-
 import 'api_common.dart';
 import 'package:http/http.dart' as http;
 import 'package:tactibetter/api/proto/entities/timesheet.pb.dart' as proto;
@@ -22,11 +19,11 @@ class NamedId {
 }
 
 class TimesheetBlock {
-  final DateTime date, begin, end;
-  final String department, taskGroup;
+  DateTime date, begin, end;
+  String department, taskGroup;
   final bool isSubmitted, isApproved;
 
-  const TimesheetBlock({required this.date, required this.begin, required this.end, required this.department, required this.taskGroup, required this.isSubmitted, required this.isApproved});
+  TimesheetBlock({required this.date, required this.begin, required this.end, required this.department, required this.taskGroup, required this.isSubmitted, required this.isApproved});
 }
 
 class TimesheetApi {
@@ -44,7 +41,7 @@ class TimesheetApi {
           Timesheet sheet = Timesheet(
             note: timesheet.noteText.isEmpty ? null : timesheet.noteText,
             departments: timesheet.departments.map((e) => NamedId(id: e.id, name: e.name)).toList(),
-            taskGroups: timesheet.departments.map((e) => NamedId(id: e.id, name: e.name)).toList(),
+            taskGroups: timesheet.taskGroups.map((e) => NamedId(id: e.id, name: e.name)).toList(),
             blocks: timesheet.blocks.map((e) => TimesheetBlock(
               date: epochToDateTimeLocal(e.date.toInt()),
               begin: epochToDateTimeLocal(e.begin.toInt()),

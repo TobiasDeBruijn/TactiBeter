@@ -70,7 +70,7 @@ class _WeekSelectorState extends State<WeekSelector> {
   }
 
   static int _currentWeekNumber() {
-    return isoWeekNumber(DateTime.now().toLocal());
+    return DateTime.now().toLocal().isoWeekNumber();
   }
 
   String _getWeekString() {

@@ -5,7 +5,7 @@ use const_format::concatcp;
 use crate::tactiplan::{CLIENT, date_string_to_epoch, TACTI_BASE, TactiError, TactiResult, time_string_to_epoch};
 use serde::{Deserialize, Serialize};
 use tap::TapFallible;
-use tracing::warn;
+use tracing::{info, warn};
 
 pub struct Timesheet {
     /// Available departments
@@ -36,6 +36,7 @@ pub struct TimesheetBlock {
     pub approved: bool,
 }
 
+#[derive(Debug)]
 pub struct NamedId {
     pub id: String,
     pub name: String,
