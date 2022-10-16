@@ -1,13 +1,6 @@
-use crate::tactiplan::{CLIENT, get_php_sessid, TACTI_BASE, TactiError, TactiResult};
-use serde::Deserialize;
+use crate::tactiplan::{CLIENT, JWT_REGEX, TACTI_BASE, TactiError, TactiResult};
 use const_format::concatcp;
-use lazy_static::lazy_static;
-use regex::Regex;
 use tracing::instrument;
-
-lazy_static! {
-    static ref JWT_REGEX: Regex = Regex::new(r#"new Slick\.Sender\(\)\.init\(Tp\.urls\['Authentication'\] \+ '/logged_in', "(.*)", ""\);"#).unwrap();
-}
 
 const INDEX_URL: &str = concatcp!(TACTI_BASE, "/app/index");
 

@@ -1,5 +1,5 @@
 use actix_multiresponse::Payload;
-use tracing::{debug, warn};
+use tracing::warn;
 use proto::{LoginRequest, LoginResponse};
 use crate::routes::error::{WebError, WebResult};
 use crate::WebData;

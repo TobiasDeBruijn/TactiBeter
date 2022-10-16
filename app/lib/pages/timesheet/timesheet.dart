@@ -20,6 +20,7 @@ class _TimesheetState extends State<TimesheetPage> {
   bool _isLoading = true;
 
   Timesheet? _timesheet;
+  DateTime? _selectedDateTime;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +36,8 @@ class _TimesheetState extends State<TimesheetPage> {
           )));
 
           if(result == null) return;
+          if(!await trySaveBlock(context, widget.session.id, result)) return;
 
-          // TODO save to API
           setState(() {
             _timesheet!.blocks.add(result);
           });
@@ -46,7 +47,13 @@ class _TimesheetState extends State<TimesheetPage> {
       body: ListView(
         children: [
           DaySelectorComponent(
-            onChange: (dateTime) => _loadTimeSheet(dateTime),
+            onChange: (dateTime) {
+              setState(() {
+                _selectedDateTime = dateTime;
+              });
+
+              _loadTimeSheet(_selectedDateTime);
+            },
           ),
           _isLoading ? _getIsLoading() : _getIsLoaded(),
           // TODO debug buttons
@@ -75,11 +82,15 @@ class _TimesheetState extends State<TimesheetPage> {
 
     return Column(
       children: List.generate(_timesheet!.blocks.length, (idx) => _EditableTimesheetBlock(
-          value: _timesheet!.blocks[idx],
-          departments: _timesheet!.departments,
-          taskGroups: _timesheet!.taskGroups,
-          onChange: (newValue) => setState(() => _timesheet!.blocks[idx] = newValue))
-      ),
+        session: widget.session,
+        value: _timesheet!.blocks[idx],
+        departments: _timesheet!.departments,
+        taskGroups: _timesheet!.taskGroups,
+        onChange: (newValue) {
+          setState(() => _timesheet!.blocks[idx] = newValue);
+          _loadTimeSheet(_selectedDateTime);
+        }
+      )),
     );
   }
 
@@ -122,17 +133,16 @@ class _TimesheetState extends State<TimesheetPage> {
         });
         break;
     }
-
-    // TODO
   }
 }
 
 class _EditableTimesheetBlock extends StatelessWidget {
+  final Session session;
   final TimesheetBlock value;
   final List<NamedId> departments, taskGroups;
   final Function(TimesheetBlock value) onChange;
 
-  const _EditableTimesheetBlock({super.key, required this.value, required this.departments, required this.taskGroups, required this.onChange});
+  const _EditableTimesheetBlock({super.key, required this.value, required this.departments, required this.taskGroups, required this.onChange, required this.session});
 
   @override
   Widget build(BuildContext context) {
@@ -145,9 +155,11 @@ class _EditableTimesheetBlock extends StatelessWidget {
             departments: departments,
             taskGroups: taskGroups,
           )));
+          debugPrint(result.toString());
+
           if(result == null) return;
 
-          // TODO save the block
+          if(!await trySaveBlock(context, session.id, result)) return;
 
           onChange(result);
         },
@@ -155,4 +167,27 @@ class _EditableTimesheetBlock extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<bool> trySaveBlock(BuildContext context, String sessionId, TimesheetBlock block) async {
+  Response<void> response = await TimesheetApi.saveTimesheet(sessionId: sessionId, blocks: [block]);
+
+  switch(response.status) {
+    case -1:
+      debugPrint("Request failed");
+      Future<void>.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Er is iets verkeerd gegaan. Probeer het later opnieuw. (E1)")));
+      });
+      break;
+    case 200:
+      return true;
+    default:
+      debugPrint("Got status code ${response.status}");
+      Future<void>.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.message!)));
+      });
+      break;
+  }
+
+  return false;
 }

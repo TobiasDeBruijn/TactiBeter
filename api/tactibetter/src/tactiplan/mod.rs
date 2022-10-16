@@ -1,9 +1,11 @@
 use chrono::{NaiveDate, NaiveTime};
 use lazy_static::lazy_static;
+use regex::Regex;
 use reqwest::Response;
 use time::{Date, Month, PrimitiveDateTime, Time, UtcOffset};
 use tracing::{instrument, warn};
 use tz::LocalTimeType;
+use serde::Serialize;
 
 pub mod login;
 pub mod schedule;
@@ -23,6 +25,14 @@ lazy_static! {
         .user_agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.53")
         .build()
         .unwrap();
+
+    static ref JWT_REGEX: Regex = Regex::new(r#"new Slick\.Sender\(\)\.init\(Tp\.urls\['Authentication'\] \+ '/logged_in', "(.*)", ""\);"#).unwrap();
+}
+
+#[derive(Debug, Serialize)]
+struct RequestForm<'a> {
+    pub data: &'a str,
+    pub e: &'a str,
 }
 
 #[macro_export]

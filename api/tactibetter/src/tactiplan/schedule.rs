@@ -1,7 +1,7 @@
 use chrono::{Datelike, NaiveDateTime};
 use chrono_tz::UTC;
 use serde::{Serialize, Deserialize};
-use crate::tactiplan::{CLIENT, date_string_to_epoch, TACTI_BASE, TactiResult, time_string_to_epoch};
+use crate::tactiplan::{CLIENT, date_string_to_epoch, RequestForm, TACTI_BASE, TactiResult, time_string_to_epoch};
 use const_format::concatcp;
 use tap::TapFallible;
 use time::OffsetDateTime;
@@ -9,13 +9,6 @@ use tracing::warn;
 use tracing::instrument;
 
 const SCHEDULE_URL: &str = concatcp!(TACTI_BASE, "/app/roosters/load");
-const SCHEDULE_PAGE_URL: &str = concatcp!(TACTI_BASE, "/app/roosters");
-
-#[derive(Debug, Serialize)]
-struct FormRequest<'a> {
-    data: &'a str,
-    e: &'a str,
-}
 
 #[derive(Debug, Serialize)]
 struct RequestData<'a> {
@@ -31,7 +24,7 @@ struct Response {
 
 #[derive(Debug, Deserialize)]
 struct Data {
-    published: Published,
+    //published: Published,
     blocks: Vec<Block>,
 }
 
@@ -82,7 +75,7 @@ pub async fn get_schedule(phpsessid: &str, jwt: &str, week: i64) -> TactiResult<
 
     let response_text = CLIENT.post(SCHEDULE_URL)
         .header("Cookie", format!("PHPSESSID={phpsessid}"))
-        .form(&FormRequest {
+        .form(&RequestForm {
             data: &data,
             e: "1",
         })

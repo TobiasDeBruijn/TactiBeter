@@ -1,0 +1,9 @@
+syntax = "proto3";
+package dev.array21.tactibetter;
+
+import "entities/timesheet.proto";
+
+message SaveTimesheetRequest {
+  repeated TimesheetBlock blocks = 1;
+  optional string note = 2;
+}

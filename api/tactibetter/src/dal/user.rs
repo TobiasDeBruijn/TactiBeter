@@ -97,6 +97,8 @@ impl User {
         Ok(exp)
     }
 
+    // TODO
+    #[allow(unused)]
     pub fn update_password<S: AsRef<str>>(&mut self, pool: &Pool, encryption_key: &str, new_password: S) -> DalResult<()> {
         let mut conn = pool.get_conn()?;
         let encrypted = crate::dal::encryption::encrypt(encryption_key.as_bytes(), new_password.as_ref().as_bytes())?;

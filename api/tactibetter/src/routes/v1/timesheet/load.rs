@@ -3,12 +3,14 @@ use actix_web::web;
 use serde::Deserialize;
 use crate::routes::error::WebResult;
 use crate::routes::session::Session;
+use tracing::instrument;
 
 #[derive(Debug, Deserialize)]
 pub struct Query {
     date: Option<i64>,
 }
 
+#[instrument(skip(session))]
 pub async fn load(session: Session, query: web::Query<Query>) -> WebResult<Payload<proto::Timesheet>> {
     let date = match query.date {
         Some(x) => x,

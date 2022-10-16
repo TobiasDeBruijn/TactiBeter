@@ -1,5 +1,9 @@
 import 'dart:io';
 
+import 'package:fixnum/fixnum.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tactibetter/api/proto/payloads/timesheet.pb.dart';
+
 import 'api_common.dart';
 import 'package:http/http.dart' as http;
 import 'package:tactibetter/api/proto/entities/timesheet.pb.dart' as proto;
@@ -54,6 +58,38 @@ class TimesheetApi {
           );
 
           return Response.ok(sheet);
+        default:
+          return Response.fail(response);
+      }
+    } on SocketException catch(e) {
+      return Response.connFail(e);
+    }
+  }
+
+  static Future<Response<void>> saveTimesheet({required String sessionId, required List<TimesheetBlock> blocks, String? note}) async {
+    debugPrint("Saving time sheet");
+    try {
+      SaveTimesheetRequest saveTimesheetRequest = SaveTimesheetRequest(
+        blocks: blocks.map((e) => proto.TimesheetBlock(
+          date: Int64(e.date.millisecondsSinceEpoch ~/ 1000),
+          begin: Int64(e.begin.millisecondsSinceEpoch ~/ 1000),
+          end: Int64(e.end.millisecondsSinceEpoch ~/ 1000),
+          department: e.department,
+          task: e.taskGroup,
+          approved: false,
+          submitted: false,
+        )).toList(),
+        note: note
+      );
+
+      http.Response response = await http.post(Uri.parse("$server/v1/timesheet/set"),
+        headers: getHeaders(sessionId),
+        body: saveTimesheetRequest.writeToBuffer(),
+      );
+
+      switch(response.statusCode) {
+        case 200:
+          return Response.ok(null);
         default:
           return Response.fail(response);
       }

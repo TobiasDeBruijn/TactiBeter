@@ -15,6 +15,8 @@ pub enum WebError {
     Dal(#[from] crate::dal::DalError),
     #[error("Unauthorized")]
     Unauthorized,
+    #[error("Bad request")]
+    BadRequest
 }
 
 impl From<TactiError> for WebError {
@@ -33,6 +35,7 @@ impl ResponseError for WebError {
             Self::InvalidCredentials => StatusCode::UNAUTHORIZED,
             Self::Tacti(_) => StatusCode::FAILED_DEPENDENCY,
             Self::Dal(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::BadRequest => StatusCode::BAD_REQUEST,
         }
     }
 }
