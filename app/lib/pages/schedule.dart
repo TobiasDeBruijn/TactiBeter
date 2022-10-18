@@ -39,6 +39,8 @@ class _ScheduleState extends State<SchedulePage> {
   }
 
   Widget _getIsLoaded() {
+    _scheduleDays.sort((a, b) => a.date.compareTo(b.date));
+
     List<Widget> scheduleComponents = _scheduleDays.map(_getScheduleDay).toList();
     return Column(
       children: [

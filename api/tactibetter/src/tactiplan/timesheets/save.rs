@@ -3,8 +3,8 @@ use chrono_tz::Tz::Europe__Amsterdam;
 use const_format::concatcp;
 use crate::tactiplan::{CLIENT, JWT_REGEX, RequestForm, TACTI_BASE, TactiError, TactiResult};
 use crate::tactiplan::timesheets::{load, TactiNote, TactiScheduledBlock, TimesheetBlock};
-use serde::Serialize;
-use tracing::instrument;
+use serde::{Serialize, Deserialize};
+use tracing::{debug, instrument, warn};
 
 #[derive(Debug)]
 pub struct TimesheetSave {
@@ -19,6 +19,12 @@ struct Request<'a> {
     note: TactiNote,
     token: &'a str,
     transaction: &'a str,
+}
+
+#[derive(Deserialize)]
+struct Response {
+    success: String,
+    msg: String,
 }
 
 const SAVE_URL: &str = concatcp!(TACTI_BASE, "/app/urencontrole_opgeven/save");
@@ -76,6 +82,8 @@ pub async fn save(phpsessid: &str, sheet: TimesheetSave) -> TactiResult<()> {
         })
         .collect::<Vec<_>>();
 
+    debug!("Saving timesheet!: {tacti_blocks:?}");
+
     // Serialize data payload
     let data = serde_json::to_string(&Request {
         date: &form_date,
@@ -87,8 +95,10 @@ pub async fn save(phpsessid: &str, sheet: TimesheetSave) -> TactiResult<()> {
         }
     })?;
 
+    debug!(data);
+
     // Finally, send the request
-    CLIENT.post(SAVE_URL)
+    let response: Response = CLIENT.post(SAVE_URL)
         .header("Cookie", format!("PHPSESSID={phpsessid}"))
         .form(&RequestForm {
             data: &data,
@@ -96,7 +106,17 @@ pub async fn save(phpsessid: &str, sheet: TimesheetSave) -> TactiResult<()> {
         })
         .send()
         .await?
-        .error_for_status()?;
+        .error_for_status()?
+        .json()
+        .await?;
+
+    debug!("Done: {}", response.success);
+
+    if response.success.ne("success") {
+        warn!("Unexpected response: {}", response.msg);
+        return Err(TactiError::UnexpectedResponse);
+    }
+
 
     Ok(())
 }

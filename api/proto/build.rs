@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 fn main() -> Result<()> {
     let mut config = prost_build::Config::new();
     config.type_attribute(".", "#[derive(serde::Serialize, serde::Deserialize)]");
+    config.protoc_arg("--experimental_allow_proto3_optional");
 
     let proto_files = discover("protos/")?;
     let stringified_paths = proto_files.into_iter()

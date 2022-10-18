@@ -32,7 +32,7 @@ class _TimesheetState extends State<TimesheetPage> {
               title: "Aanmaken",
               departments: _timesheet!.departments,
               taskGroups: _timesheet!.taskGroups,
-              createForDateTime: DateTime.now().toLocal(),
+              createForDateTime: _selectedDateTime,
           )));
 
           if(result == null) return;

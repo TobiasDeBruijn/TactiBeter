@@ -4,6 +4,7 @@ import 'package:tactibetter/views/splash.dart';
 void main() {
   runApp(const MaterialApp(
     title: 'TactiBeter',
-    home: SplashView()
+    home: SplashView(),
+    debugShowCheckedModeBanner: false,
   ));
 }
