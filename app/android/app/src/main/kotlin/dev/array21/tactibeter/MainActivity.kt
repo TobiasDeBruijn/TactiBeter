@@ -1,4 +1,4 @@
-package dev.array21.tactibetter
+package dev.array21.tactibeter
 
 import io.flutter.embedding.android.FlutterActivity
 

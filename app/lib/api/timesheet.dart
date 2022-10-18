@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:tactibetter/api/proto/payloads/timesheet.pb.dart';
+import 'package:tactibeter/api/proto/payloads/timesheet.pb.dart';
+import 'package:tactibeter/util/datetime.dart';
 
 import 'api_common.dart';
 import 'package:http/http.dart' as http;
-import 'package:tactibetter/api/proto/entities/timesheet.pb.dart' as proto;
+import 'package:tactibeter/api/proto/entities/timesheet.pb.dart' as proto;
 
 class Timesheet {
   final List<NamedId> departments, taskGroups;
@@ -32,6 +33,47 @@ class TimesheetBlock {
 
 class TimesheetApi {
   static Future<Response<Timesheet>> getTimesheet({required String sessionId, int? date}) async {
+    if(sessionId == "developeraccess") {
+      Duration roundTo = const Duration(minutes: 15);
+      DateTime nowLocal = DateTime.now().toLocal();
+
+      if(date != null) {
+        nowLocal = DateTime.fromMillisecondsSinceEpoch(date * 1000).add(Duration(hours: nowLocal.hour));
+      }
+
+      return Response.ok(
+        Timesheet(
+          blocks: [
+            TimesheetBlock(
+              date: nowLocal.roundDown(),
+              begin: nowLocal.roundDown(delta: roundTo),
+              end: nowLocal.roundDown(delta: roundTo).add(const Duration(hours: 3)),
+              department: "0",
+              taskGroup: "0",
+              isSubmitted: true,
+              isApproved: false,
+            ),
+            TimesheetBlock(
+              date: nowLocal.roundDown(),
+              begin: nowLocal.roundDown(delta: roundTo).add(const Duration(hours: 3)),
+              end: nowLocal.roundDown(delta: roundTo).add(const Duration(hours: 6)),
+              department: "0",
+              taskGroup: "1",
+              isSubmitted: true,
+              isApproved: false,
+            ),
+          ],
+          departments: [
+            const NamedId(id: "0", name: "Logistics"),
+          ],
+          taskGroups: [
+            const NamedId(id: "0", name: "Sort goods"),
+            const NamedId(id: "1", name: "Cleaning"),
+          ],
+        )
+      );
+    }
+
     String queryString = date != null ? "?date=$date" : "";
 
     try {
@@ -67,6 +109,10 @@ class TimesheetApi {
   }
 
   static Future<Response<void>> saveTimesheet({required String sessionId, required List<TimesheetBlock> blocks, String? note}) async {
+    if(sessionId == 'developeraccess') {
+      return Response.ok(null);
+    }
+
     debugPrint("Saving time sheet");
     try {
       SaveTimesheetRequest saveTimesheetRequest = SaveTimesheetRequest(

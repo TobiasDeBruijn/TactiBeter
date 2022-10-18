@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tactibetter/api/login.dart';
-import 'package:tactibetter/pages/about.dart';
-import 'package:tactibetter/pages/schedule.dart';
-import 'package:tactibetter/pages/timesheet/timesheet.dart';
-import 'package:tactibetter/util/prefs.dart';
-import 'package:tactibetter/views/login.dart';
+import 'package:tactibeter/api/login.dart';
+import 'package:tactibeter/pages/about.dart';
+import 'package:tactibeter/pages/schedule.dart';
+import 'package:tactibeter/pages/timesheet/timesheet.dart';
+import 'package:tactibeter/util/prefs.dart';
+import 'package:tactibeter/views/login.dart';
 
 class HomeView extends StatefulWidget {
   final Session session;

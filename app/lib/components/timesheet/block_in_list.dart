@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tactibetter/api/timesheet.dart';
-import 'package:tactibetter/util/datetime.dart';
+import 'package:tactibeter/api/timesheet.dart';
+import 'package:tactibeter/util/datetime.dart';
 
 class TimesheetBlockInListComponent extends StatelessWidget {
   final TimesheetBlock timesheetBlock;

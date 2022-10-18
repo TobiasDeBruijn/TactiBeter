@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tactibetter/api/api_common.dart';
+import 'package:tactibeter/api/api_common.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});

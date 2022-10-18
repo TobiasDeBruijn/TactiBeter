@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:new_version/new_version.dart';
-import 'package:tactibetter/api/api_common.dart';
-import 'package:tactibetter/api/login.dart';
-import 'package:tactibetter/util/prefs.dart';
-import 'package:tactibetter/views/home.dart';
-import 'package:tactibetter/views/login.dart';
+import 'package:tactibeter/api/api_common.dart';
+import 'package:tactibeter/api/login.dart';
+import 'package:tactibeter/util/prefs.dart';
+import 'package:tactibeter/views/home.dart';
+import 'package:tactibeter/views/login.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({Key? key}) : super(key: key);

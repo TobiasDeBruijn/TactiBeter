@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tactibetter/api/api_common.dart';
-import 'package:tactibetter/api/login.dart';
-import 'package:tactibetter/util/prefs.dart';
-import 'package:tactibetter/views/home.dart';
+import 'package:tactibeter/api/api_common.dart';
+import 'package:tactibeter/api/login.dart';
+import 'package:tactibeter/util/prefs.dart';
+import 'package:tactibeter/views/home.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({Key? key}) : super(key: key);

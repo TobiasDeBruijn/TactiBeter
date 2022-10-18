@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tactibetter/api/schedule.dart';
-import 'package:tactibetter/util/datetime.dart';
+import 'package:tactibeter/api/schedule.dart';
+import 'package:tactibeter/util/datetime.dart';
 
 class ScheduleEntryComponent extends StatelessWidget {
   final ScheduleEntry scheduleEntry;

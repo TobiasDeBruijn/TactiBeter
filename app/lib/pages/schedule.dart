@@ -1,12 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tactibetter/api/api_common.dart';
-import 'package:tactibetter/api/login.dart';
-import 'package:tactibetter/api/schedule.dart';
-import 'package:tactibetter/components/schedule/schedule_day.dart';
-import 'package:tactibetter/components/weekselector.dart';
+import 'package:tactibeter/api/api_common.dart';
+import 'package:tactibeter/api/login.dart';
+import 'package:tactibeter/api/schedule.dart';
+import 'package:tactibeter/components/schedule/schedule_day.dart';
+import 'package:tactibeter/components/weekselector.dart';
 
 class SchedulePage extends StatefulWidget {
   final Session session;
@@ -79,6 +78,8 @@ class _ScheduleState extends State<SchedulePage> {
   }
 
   Widget _getDebugButtons() {
+    return const SizedBox.shrink();
+
     if(kReleaseMode) {
       return const SizedBox.shrink();
     }
