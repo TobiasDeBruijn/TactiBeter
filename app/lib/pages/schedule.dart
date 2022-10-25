@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+// ignore_for_file: unnecessary_cast
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tactibeter/api/api_common.dart';
@@ -20,13 +21,29 @@ class _ScheduleState extends State<SchedulePage> {
   bool _isLoading = false;
 
   @override
+
   Widget build(BuildContext context) {
+    List<Widget> children = {
+      WeekSelector(onChange: (newWeek) => _loadSchedule(weekNumber: newWeek)) as Widget,
+    }.toList(growable: true);
+
+    if(_isLoading) {
+      children.add(_getIsLoading() as Widget);
+    } else {
+      _scheduleDays.sort((a, b) => a.date.compareTo(b.date));
+
+      List<Widget> scheduleComponents = _scheduleDays.map(_getScheduleDay).toList();
+      if(scheduleComponents.isEmpty) {
+        children.add(_getNoScheduleAvailableText() as Widget);
+      } else {
+        for(Widget w in scheduleComponents) {
+          children.add(w as Widget);
+        }
+      }
+    }
+
     return ListView(
-      children: [
-        WeekSelector(onChange: (newWeek) => _loadSchedule(weekNumber: newWeek)),
-        _isLoading ? _getIsLoading() : _getIsLoaded(),
-        _getDebugButtons(),
-      ],
+      children: children,
     );
   }
 
@@ -34,24 +51,6 @@ class _ScheduleState extends State<SchedulePage> {
     return const Align(
       alignment: Alignment.center,
       child: CircularProgressIndicator(),
-    );
-  }
-
-  Widget _getIsLoaded() {
-    _scheduleDays.sort((a, b) => a.date.compareTo(b.date));
-
-    List<Widget> scheduleComponents = _scheduleDays.map(_getScheduleDay).toList();
-    return Column(
-      children: [
-        scheduleComponents.isNotEmpty ? _getScheduleListView(scheduleComponents) : _getNoScheduleAvailableText()
-      ],
-    );
-  }
-
-  ListView _getScheduleListView(List<Widget> children) {
-    return ListView(
-      shrinkWrap: true,
-      children: children,
     );
   }
 
@@ -75,58 +74,6 @@ class _ScheduleState extends State<SchedulePage> {
   @override void initState() {
     super.initState();
     _loadSchedule();
-  }
-
-  Widget _getDebugButtons() {
-    return const SizedBox.shrink();
-
-    if(kReleaseMode) {
-      return const SizedBox.shrink();
-    }
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ElevatedButton(
-          child: const Text("Set fake schedule"),
-          onPressed: () {
-            DateTime localNow = DateTime.now().toLocal();
-            setState(() {
-              _scheduleDays = [
-                ScheduleDay(
-                    date: localNow,
-                    begin: localNow,
-                    end: localNow.add(const Duration(hours: 5)),
-                    scheduleEntries: [
-                      ScheduleEntry(
-                          begin: localNow,
-                          end: localNow.add(const Duration(hours: 1)),
-                          created: localNow.subtract(const Duration(days: 5)),
-                          department: "Example dep",
-                          task: "Task A",
-                      ),
-                      ScheduleEntry(
-                          begin: localNow.add(const Duration(hours: 1)),
-                          end: localNow.add(const Duration(hours: 3)),
-                          created: localNow.subtract(const Duration(days: 5)),
-                          department: "Example dep",
-                          task: "Task B"
-                      ),
-                      ScheduleEntry(
-                          begin: localNow.add(const Duration(hours: 3)),
-                          end: localNow.add(const Duration(hours: 7)),
-                          created: localNow.subtract(const Duration(days: 5)),
-                          department: "Example dep",
-                          task: "Task C"
-                      ),
-                    ]
-                )
-              ];
-            });
-          },
-        )
-      ],
-    );
   }
 
   void _loadSchedule({int? weekNumber}) async {

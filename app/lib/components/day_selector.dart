@@ -90,6 +90,6 @@ class _DaySelectorState extends State<DaySelectorComponent> {
       }
     }
 
-    return dateOnlyFormat.format(_dateTime);
+    return "${weekDayFormat.format(_dateTime)} ${dateOnlyFormat.format(_dateTime)}";
   }
 }

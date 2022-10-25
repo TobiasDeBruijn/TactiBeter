@@ -114,6 +114,8 @@ pub async fn save(phpsessid: &str, sheet: TimesheetSave) -> TactiResult<()> {
 
     if response.success.ne("success") {
         warn!("Unexpected response: {}", response.msg);
+        debug!("Sent payload: {}", &data);
+
         return Err(TactiError::UnexpectedResponse);
     }
 
